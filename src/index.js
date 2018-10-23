@@ -3,12 +3,44 @@ import ReactDOM from 'react-dom';
 
 import * as serviceWorker from './serviceWorker';
 
-function Point(props) {
-    return <circle cx={props.x} cy={props.y} r="3" />
+import './index.css';
+
+class PointComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            fill: "black",
+        }
+
+        this.hoverOn = this.hoverOn.bind(this);
+        this.hoverOff = this.hoverOff.bind(this);
+    }
+
+    hoverOn() {
+        this.setState({fill: "red"});
+    }
+
+    hoverOff() {
+        this.setState({fill: "black"});
+    }
+
+    render() {
+        return <circle 
+                    r="10"
+                    id={this.props.id}
+                    cx={this.props.x} 
+                    cy={this.props.y} 
+                    onMouseEnter={this.hoverOn} 
+                    onMouseLeave={this.hoverOff}
+                    onMouseDown={this.props.onMouseDown}
+                    fill={this.state.fill}
+                />
+    }
+
 }
 
 function Path(props) {
-    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY} stroke="aqua"/>
+    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="aqua"/>
 }
 
 class CanvasComponent extends React.Component {
@@ -18,19 +50,30 @@ class CanvasComponent extends React.Component {
             points: [],
             x: 0,
             y: 0,
+            selected: undefined,
         };
 
+        this.handleClik = this.handleClick.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
+        this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleClick(id) {
+        console.log("You selected: " + id);
+        this.setState({selected: id});
     }
 
     renderPoints() {
         let points = [];
         
         for (let i = 0; i < this.state.points.length; i++){
-            points.push(<Point 
+            points.push(<PointComponent
+                            key={i}
+                            id={i}
                             x={this.state.points[i].x} 
                             y={this.state.points[i].y}
+                            onMouseDown={() => this.handleClick(i)}
                         />);
         }
         return points;
@@ -49,22 +92,32 @@ class CanvasComponent extends React.Component {
                             startX={start.x} 
                             startY={start.y} 
                             endX={end.x} 
-                            endY={end.y} 
+                            endY={end.y}
+                            key={i}
                         />);
         }
         return lines;
     }   
 
     handlePointUpdate(event) {
+        let updatedPoint = {x: event.screenX, y: event.screenY-100};
+        let points = this.state.points.slice();
+        points[this.state.selected].x = updatedPoint.x;
+        points[this.state.selected].y = updatedPoint.y;
+        this.setState({points: points});
+        event.preventDefault();
+    }
+
+    handlePointsUpdate(event) {
         const name = event.target.name;
         const value = event.target.value;
-        console.log(name + ": " + value);
-        this.setState({[name]: value});    
+        this.setState({[name]: value}); 
+        event.preventDefault();
     }
 
     handleSubmit(event) {
         let newPoint = {x: this.state.x, y: this.state.y};
-        const points = this.state.points.slice();
+        let points = this.state.points.slice();
         points.push(newPoint);
         this.setState({points: points});
         event.preventDefault();
@@ -76,15 +129,15 @@ class CanvasComponent extends React.Component {
 
         return (
             <div>
-                <svg height="500" width="1000"> 
+                <svg style={{border: "1px solid black"}} height="600" width="1000" onMouseUp={this.handlePointUpdate}>  
                     <g  stroke="black" fill="black">
                         {points}
                     </g> 
                     {lines}
                 </svg>
                 <form onSubmit={this.handleSubmit}>
-                    <input type="number" name="x" value={this.state.x} onChange={this.handlePointUpdate} placeholder="X" />
-                    <input type="number" name="y" value={this.state.y} onChange={this.handlePointUpdate} placeholder="Y" />
+                    <input type="number" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
+                    <input type="number" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" />
                     <input type="submit" value="Add"/>
                 </form>
             </div>
