@@ -100,6 +100,9 @@ class CanvasComponent extends React.Component {
     }   
 
     handlePointUpdate(event) {
+        if(this.state.selected === undefined) {
+            return
+        }
         let updatedPoint = {x: event.screenX, y: event.screenY-100};
         let points = this.state.points.slice();
         points[this.state.selected].x = updatedPoint.x;
