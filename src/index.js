@@ -40,14 +40,21 @@ class PointComponent extends React.Component {
 }
 
 function Path(props) {
-    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="aqua"/>
+    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
 }
+
 
 class CanvasComponent extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            points: [],
+            points: [
+                {x: 100, y: 350},
+                {x: 250, y: 50},
+                {x: 400, y: 350},
+                {x: 550, y: 50},
+                {x: 700, y: 350},
+            ],
             x: 0,
             y: 0,
             selected: undefined,
@@ -103,10 +110,12 @@ class CanvasComponent extends React.Component {
         if(this.state.selected === undefined) {
             return
         }
-        let updatedPoint = {x: event.screenX, y: event.screenY-100};
-        let points = this.state.points.slice();
-        points[this.state.selected].x = updatedPoint.x;
-        points[this.state.selected].y = updatedPoint.y;
+        var updatedPoint = {x: event.screenX, y: event.screenY-100};
+        var points = this.state.points.filter((_,i) => i !== this.state.selected);
+        points.push(updatedPoint);;
+        points.sort((a, b) => {
+            return a.x - b.x;
+        });
         this.setState({points: points});
         event.preventDefault();
     }
@@ -119,8 +128,8 @@ class CanvasComponent extends React.Component {
     }
 
     handleSubmit(event) {
-        let newPoint = {x: this.state.x, y: this.state.y};
-        let points = this.state.points.slice();
+        var newPoint = {x: this.state.x, y: this.state.y};
+        var points = this.state.points.slice();
         points.push(newPoint);
         this.setState({points: points});
         event.preventDefault();
