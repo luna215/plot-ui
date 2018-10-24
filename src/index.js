@@ -43,6 +43,37 @@ function Path(props) {
     return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
 }
 
+function Poly(props) {
+    if (props.k == null) props.k = 1;
+    var data = props.data;
+    var size = data.length;
+    var last = size - 2;
+    var path = "M" + [data[0].x, data[0].y];
+
+    for (var i=0; i<size-1;i++){
+        var x0 = i ? data[i-1].x : data[0].x;
+        var y0 = i ? data[i-1].y : data[0].y;
+
+        var x1 = data[i].x;
+        var y1 = data[i].y;
+
+        var x2 = data[i+1].x;
+        var y2 = data[i+1].y;
+
+        var x3 = i !== last ? data[i+2].x : x2;
+        var y3 = i !== last ? data[i+2].y : y2; 
+
+        var cp1x = x1 + (x2 - x0)/6 * props.k;
+        var cp1y = y1 + (y2 -y0)/6 * props.k;
+
+        var cp2x = x2 - (x3 -x1)/6 * props.k;
+        var cp2y = y2 - (y3 - y1)/6 * props.k;
+
+        path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2];
+    }
+
+    return <path d={path} stroke="red" fill="none"/>
+}
 
 class CanvasComponent extends React.Component {
     constructor (props) {
@@ -52,8 +83,6 @@ class CanvasComponent extends React.Component {
                 {x: 100, y: 350},
                 {x: 250, y: 50},
                 {x: 400, y: 350},
-                {x: 550, y: 50},
-                {x: 700, y: 350},
             ],
             x: 0,
             y: 0,
@@ -67,7 +96,6 @@ class CanvasComponent extends React.Component {
     }
 
     handleClick(id) {
-        console.log("You selected: " + id);
         this.setState({selected: id});
     }
 
@@ -141,11 +169,15 @@ class CanvasComponent extends React.Component {
 
         return (
             <div>
-                <svg style={{border: "1px solid black"}} height="600" width="1000" onMouseUp={this.handlePointUpdate}>  
+                <svg style={{border: "1px solid black"}} height="1000" width="1000" onMouseUp={this.handlePointUpdate}>  
                     <g  stroke="black" fill="black">
                         {points}
                     </g> 
                     {lines}
+                    <Poly 
+                    data={this.state.points}
+                    k={1}
+                    />
                 </svg>
                 <form onSubmit={this.handleSubmit}>
                     <input type="number" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
