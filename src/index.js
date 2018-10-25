@@ -21,10 +21,13 @@ class CanvasComponent extends React.Component {
             y: 0,
             selected: undefined,
             copyPoint: undefined,
+            startingX: 0,
+            startingY: 0,
         };
 
         this.startDrag = this.startDrag.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
+        this.refCallBack = this.refCallBack.bind(this);
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
@@ -47,7 +50,7 @@ class CanvasComponent extends React.Component {
         if(this.state.copyPoint === undefined){
             return
         }
-        let updatedCopyPoint = {x: event.screenX, y: event.screenY-100};
+        let updatedCopyPoint = {x: event.screenX-this.state.startingX, y: event.screenY-this.state.startingY-100};
         this.setState({
             copyPoint: <PointComponent fill="blue" key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} />
         });
@@ -92,7 +95,7 @@ class CanvasComponent extends React.Component {
         if(this.state.selected === undefined) {
             return
         }
-        let updatedPoint = {x: event.screenX, y: event.screenY-100};
+        let updatedPoint = {x: event.screenX-this.state.startingX, y: event.screenY-this.state.startingY-100};
         let points = this.state.points.filter((_,i) => i !== this.state.selected);
         points.push(updatedPoint);;
         points.sort((a, b) => {
@@ -122,6 +125,15 @@ class CanvasComponent extends React.Component {
         event.preventDefault();
     }
 
+    refCallBack(element) {
+        if(element){
+            let startingX = element.getBoundingClientRect().x;
+            let startingY = element.getBoundingClientRect().y;
+            this.setState({startingX: startingX});
+            this.setState({startingY: startingY});
+        }
+    }
+
     render() {
         let points = this.renderPoints();
         let lines = this.renderLines();
@@ -129,7 +141,7 @@ class CanvasComponent extends React.Component {
 
         return (
             <div>
-                <svg style={{border: "1px solid black"}} height="1000" width="1000" onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
+                <svg ref={this.refCallBack} height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
                     <g  stroke="black" fill="black">
                         {points}
                         {ghostPoint}
@@ -151,7 +163,9 @@ class CanvasComponent extends React.Component {
     }
 }
 
-ReactDOM.render(<CanvasComponent />, document.getElementById('root'));
+ReactDOM.render(<CanvasComponent 
+                    height="1000"
+                    width="1500"/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

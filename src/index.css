@@ -12,3 +12,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+svg {
+  border: 1px solid black;
+  margin: 5em 10em;
+}
