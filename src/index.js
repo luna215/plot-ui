@@ -3,77 +3,8 @@ import ReactDOM from 'react-dom';
 
 import * as serviceWorker from './serviceWorker';
 
+import PointComponent from './PointComponent';
 import './index.css';
-
-class PointComponent extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            fill: "black",
-        }
-
-        this.hoverOn = this.hoverOn.bind(this);
-        this.hoverOff = this.hoverOff.bind(this);
-    }
-
-    hoverOn() {
-        this.setState({fill: "red"});
-    }
-
-    hoverOff() {
-        this.setState({fill: "black"});
-    }
-
-    render() {
-        return <circle 
-                    r="10"
-                    id={this.props.id}
-                    cx={this.props.x} 
-                    cy={this.props.y} 
-                    onMouseEnter={this.hoverOn} 
-                    onMouseLeave={this.hoverOff}
-                    onMouseDown={this.props.onMouseDown}
-                    fill={this.state.fill}
-                />
-    }
-
-}
-
-function Path(props) {
-    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
-}
-
-function Poly(props) {
-    if (props.k == null) props.k = 1;
-    var data = props.data;
-    var size = data.length;
-    var last = size - 2;
-    var path = "M" + [data[0].x, data[0].y];
-
-    for (var i=0; i<size-1;i++){
-        var x0 = i ? data[i-1].x : data[0].x;
-        var y0 = i ? data[i-1].y : data[0].y;
-
-        var x1 = data[i].x;
-        var y1 = data[i].y;
-
-        var x2 = data[i+1].x;
-        var y2 = data[i+1].y;
-
-        var x3 = i !== last ? data[i+2].x : x2;
-        var y3 = i !== last ? data[i+2].y : y2; 
-
-        var cp1x = x1 + (x2 - x0)/6 * props.k;
-        var cp1y = y1 + (y2 -y0)/6 * props.k;
-
-        var cp2x = x2 - (x3 -x1)/6 * props.k;
-        var cp2y = y2 - (y3 - y1)/6 * props.k;
-
-        path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2];
-    }
-
-    return <path d={path} stroke="red" fill="none"/>
-}
 
 class CanvasComponent extends React.Component {
     constructor (props) {
@@ -83,6 +14,8 @@ class CanvasComponent extends React.Component {
                 {x: 100, y: 350},
                 {x: 250, y: 50},
                 {x: 400, y: 350},
+                {x: 550, y: 50},
+                {x: 700, y: 350}
             ],
             x: 0,
             y: 0,
@@ -196,3 +129,39 @@ ReactDOM.render(<CanvasComponent />, document.getElementById('root'));
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+function Path(props) {
+    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
+}
+
+function Poly(props) {
+    if (props.k == null) props.k = 0.5;
+    var data = props.data;
+    var size = data.length;
+    var last = size - 2;
+    var path = "M" + [data[0].x, data[0].y];
+
+    for (var i=0; i<size-1;i++){
+        var x0 = i ? data[i-1].x : data[0].x;
+        var y0 = i ? data[i-1].y : data[0].y;
+
+        var x1 = data[i].x;
+        var y1 = data[i].y;
+
+        var x2 = data[i+1].x;
+        var y2 = data[i+1].y;
+
+        var x3 = i !== last ? data[i+2].x : x2;
+        var y3 = i !== last ? data[i+2].y : y2; 
+
+        var cp1x = x1 + (x2 - x0)/6 * props.k;
+        var cp1y = y1 + (y2 -y0)/6 * props.k;
+
+        var cp2x = x2 - (x3 -x1)/6 * props.k;
+        var cp2y = y2 - (y3 - y1)/6 * props.k;
+
+        path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2];
+    }
+
+    return <path d={path} stroke="red" fill="none"/>
+}
