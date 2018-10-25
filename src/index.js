@@ -20,16 +20,37 @@ class CanvasComponent extends React.Component {
             x: 0,
             y: 0,
             selected: undefined,
+            copyPoint: undefined,
         };
 
-        this.handleClik = this.handleClick.bind(this);
+        this.startDrag = this.startDrag.bind(this);
+        this.handleDrag = this.handleDrag.bind(this);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleClick(id) {
+    handleMouseDown(id) {
         this.setState({selected: id});
+        this.startDrag(id);
+    }
+
+    startDrag(id) {
+        let copyPoint = this.state.points[id];
+        this.setState({
+            copyPoint: <PointComponent fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />
+        });
+    }
+
+    handleDrag(event) {
+        if(this.state.copyPoint === undefined){
+            return
+        }
+        let updatedCopyPoint = {x: event.screenX, y: event.screenY-100};
+        this.setState({
+            copyPoint: <PointComponent fill="blue" key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} />
+        });
     }
 
     renderPoints() {
@@ -41,7 +62,7 @@ class CanvasComponent extends React.Component {
                             id={i}
                             x={this.state.points[i].x} 
                             y={this.state.points[i].y}
-                            onMouseDown={() => this.handleClick(i)}
+                            onMouseDown={() => this.handleMouseDown(i)}
                         />);
         }
         return points;
@@ -71,13 +92,15 @@ class CanvasComponent extends React.Component {
         if(this.state.selected === undefined) {
             return
         }
-        var updatedPoint = {x: event.screenX, y: event.screenY-100};
-        var points = this.state.points.filter((_,i) => i !== this.state.selected);
+        let updatedPoint = {x: event.screenX, y: event.screenY-100};
+        let points = this.state.points.filter((_,i) => i !== this.state.selected);
         points.push(updatedPoint);;
         points.sort((a, b) => {
             return a.x - b.x;
         });
         this.setState({points: points});
+        this.setState({selected: undefined});
+        this.setState({copyPoint: undefined});
         event.preventDefault();
     }
 
@@ -89,8 +112,8 @@ class CanvasComponent extends React.Component {
     }
 
     handleSubmit(event) {
-        var newPoint = {x: this.state.x, y: this.state.y};
-        var points = this.state.points.slice();
+        let newPoint = {x: this.state.x, y: this.state.y};
+        let points = this.state.points.slice();
         points.push(newPoint);
         this.setState({points: points});
         event.preventDefault();
@@ -99,12 +122,14 @@ class CanvasComponent extends React.Component {
     render() {
         let points = this.renderPoints();
         let lines = this.renderLines();
+        let ghostPoint = this.state.copyPoint;
 
         return (
             <div>
-                <svg style={{border: "1px solid black"}} height="1000" width="1000" onMouseUp={this.handlePointUpdate}>  
+                <svg style={{border: "1px solid black"}} height="1000" width="1000" onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
                     <g  stroke="black" fill="black">
                         {points}
+                        {ghostPoint}
                     </g> 
                     {lines}
                     <Poly 
@@ -136,29 +161,29 @@ function Path(props) {
 
 function Poly(props) {
     if (props.k == null) props.k = 0.5;
-    var data = props.data;
-    var size = data.length;
-    var last = size - 2;
-    var path = "M" + [data[0].x, data[0].y];
+    let data = props.data;
+    let size = data.length;
+    let last = size - 2;
+    let path = "M" + [data[0].x, data[0].y];
 
-    for (var i=0; i<size-1;i++){
-        var x0 = i ? data[i-1].x : data[0].x;
-        var y0 = i ? data[i-1].y : data[0].y;
+    for (let i=0; i<size-1;i++){
+        let x0 = i ? data[i-1].x : data[0].x;
+        let y0 = i ? data[i-1].y : data[0].y;
 
-        var x1 = data[i].x;
-        var y1 = data[i].y;
+        let x1 = data[i].x;
+        let y1 = data[i].y;
 
-        var x2 = data[i+1].x;
-        var y2 = data[i+1].y;
+        let x2 = data[i+1].x;
+        let y2 = data[i+1].y;
 
-        var x3 = i !== last ? data[i+2].x : x2;
-        var y3 = i !== last ? data[i+2].y : y2; 
+        let x3 = i !== last ? data[i+2].x : x2;
+        let y3 = i !== last ? data[i+2].y : y2; 
 
-        var cp1x = x1 + (x2 - x0)/6 * props.k;
-        var cp1y = y1 + (y2 -y0)/6 * props.k;
+        let cp1x = x1 + (x2 - x0)/6 * props.k;
+        let cp1y = y1 + (y2 -y0)/6 * props.k;
 
-        var cp2x = x2 - (x3 -x1)/6 * props.k;
-        var cp2y = y2 - (y3 - y1)/6 * props.k;
+        let cp2x = x2 - (x3 -x1)/6 * props.k;
+        let cp2y = y2 - (y3 - y1)/6 * props.k;
 
         path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2];
     }

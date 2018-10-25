@@ -4,7 +4,7 @@ export default class PointComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            fill: "black",
+            fill: this.props.fill,
         }
 
         this.hoverOn = this.hoverOn.bind(this);
