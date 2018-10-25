@@ -107,7 +107,7 @@ class CanvasComponent extends React.Component {
     handlePointsUpdate(event) {
         const name = event.target.name;
         const value = event.target.value;
-        this.setState({[name]: value}); 
+        this.setState({[name]: value});
         event.preventDefault();
     }
 
@@ -115,6 +115,9 @@ class CanvasComponent extends React.Component {
         let newPoint = {x: this.state.x, y: this.state.y};
         let points = this.state.points.slice();
         points.push(newPoint);
+        points.sort((a, b) => {
+            return a.x - b.x;
+        });
         this.setState({points: points});
         event.preventDefault();
     }
