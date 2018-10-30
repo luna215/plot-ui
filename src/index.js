@@ -172,6 +172,7 @@ class CanvasComponent extends React.Component {
                     
                     
                 </svg>
+                <hr />
                 <form onSubmit={this.handleSubmit}>
                     <input type="number" min="0" max="1" step="0.01" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
                     <input type="number" min="0" max="1" step="0.01" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" />

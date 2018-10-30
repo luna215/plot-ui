@@ -13,7 +13,11 @@ code {
     monospace;
 }
 
-svg {
-  border: 1px solid black;
+div {
   margin: 5em 10em;
+}
+
+svg { 
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
 }
