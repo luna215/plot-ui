@@ -12,13 +12,10 @@ class CanvasComponent extends React.Component {
         this.state = {
             points: [
                 {x: 0, y: 0},
-                {x: 250, y: 50},
-                {x: 400, y: 350},
-                {x: 550, y: 50},
-                {x: 1000, y: 0}
+                {x: props.width, y: 0}
             ],
-            x: 0,
-            y: 0,
+            x: undefined,
+            y: undefined,
             selected: undefined,
             copyPoint: undefined,
             startingX: 0,
@@ -111,12 +108,12 @@ class CanvasComponent extends React.Component {
         let updatedPoint = {x: this.state.updatedX, y: this.state.updatedY};
         let points = this.state.points.filter((_,i) => i !== this.state.selected);
         points.push(updatedPoint);;
-        points.sort((a, b) => {
-            return a.x - b.x;
+        points.sort((a, b) => a.x - b.x);
+        this.setState({
+            points: points,
+            selected: undefined,
+            copyPoint: undefined,
         });
-        this.setState({points: points});
-        this.setState({selected: undefined});
-        this.setState({copyPoint: undefined});
         event.preventDefault();
     }
 
@@ -130,10 +127,21 @@ class CanvasComponent extends React.Component {
     handleSubmit(event) {
         let newPoint = {x: this.state.x, y: this.state.y};
         let points = this.state.points.slice();
+        newPoint = this.normalizePoint(newPoint);
         points.push(newPoint);
         points.sort((a, b) => a.x - b.x);
-        this.setState({points: points});
+        this.setState({
+            points: points,
+            x: undefined,
+            y: undefined,
+        });
         event.preventDefault();
+    }
+
+    normalizePoint(point) {
+        let normalizedX = point.x*this.props.width;
+        let normalizedY = point.y*this.props.height;
+        return {x:normalizedX, y:normalizedY};
     }
 
     refCallBack(element) {
@@ -159,17 +167,14 @@ class CanvasComponent extends React.Component {
                         {points}
                         {ghostPoint}
                         {lines}
-                        <Poly 
-                            data={this.state.points}
-                            k={1}
-                        />
+                        <Poly data={this.state.points} k={0.5}/>
                     </g> 
                     
                     
                 </svg>
                 <form onSubmit={this.handleSubmit}>
-                    <input type="number" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
-                    <input type="number" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" />
+                    <input type="number" min="0" max="1" step="0.01" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
+                    <input type="number" min="0" max="1" step="0.01" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" />
                     <input type="submit" value="Add"/>
                 </form>
             </div>
