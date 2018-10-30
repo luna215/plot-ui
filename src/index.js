@@ -11,11 +11,11 @@ class CanvasComponent extends React.Component {
         super(props);
         this.state = {
             points: [
-                {x: 100, y: 350},
+                {x: 0, y: 0},
                 {x: 250, y: 50},
                 {x: 400, y: 350},
                 {x: 550, y: 50},
-                {x: 700, y: 350}
+                {x: 1000, y: 0}
             ],
             x: 0,
             y: 0,
@@ -23,6 +23,9 @@ class CanvasComponent extends React.Component {
             copyPoint: undefined,
             startingX: 0,
             startingY: 0,
+            updatedX: 0,
+            updatedY: 0,
+            boxBottom: 0,
         };
 
         this.startDrag = this.startDrag.bind(this);
@@ -50,7 +53,17 @@ class CanvasComponent extends React.Component {
         if(this.state.copyPoint === undefined){
             return
         }
-        let updatedCopyPoint = {x: event.screenX-this.state.startingX, y: event.screenY-this.state.startingY-100};
+        let y;
+        if(event.screenY > this.state.boxBottom){
+            y = (this.state.boxBottom + 100) - event.screenY;
+        } else {
+            y = this.state.boxBottom - event.screenY + 100;
+        }
+        let updatedCopyPoint = {x: event.screenX-this.state.startingX, y: y};
+        this.setState({
+            updatedX: updatedCopyPoint.x,
+            updatedY: updatedCopyPoint.y,
+        });
         this.setState({
             copyPoint: <PointComponent fill="blue" key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} />
         });
@@ -95,7 +108,7 @@ class CanvasComponent extends React.Component {
         if(this.state.selected === undefined) {
             return
         }
-        let updatedPoint = {x: event.screenX-this.state.startingX, y: event.screenY-this.state.startingY-100};
+        let updatedPoint = {x: this.state.updatedX, y: this.state.updatedY};
         let points = this.state.points.filter((_,i) => i !== this.state.selected);
         points.push(updatedPoint);;
         points.sort((a, b) => {
@@ -118,19 +131,19 @@ class CanvasComponent extends React.Component {
         let newPoint = {x: this.state.x, y: this.state.y};
         let points = this.state.points.slice();
         points.push(newPoint);
-        points.sort((a, b) => {
-            return a.x - b.x;
-        });
+        points.sort((a, b) => a.x - b.x);
         this.setState({points: points});
         event.preventDefault();
     }
 
     refCallBack(element) {
+        console.log(element.getBoundingClientRect());
         if(element){
-            let startingX = element.getBoundingClientRect().x;
-            let startingY = element.getBoundingClientRect().y;
-            this.setState({startingX: startingX});
-            this.setState({startingY: startingY});
+            this.setState({
+                startingX: element.getBoundingClientRect().x,
+                startingY: element.getBoundingClientRect().y,
+                boxBottom: element.getBoundingClientRect().bottom,
+            });
         }
     }
 
@@ -142,15 +155,17 @@ class CanvasComponent extends React.Component {
         return (
             <div>
                 <svg ref={this.refCallBack} height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
-                    <g  stroke="black" fill="black">
+                    <g  transform="matrix(1 0 0 -1 0 500)" stroke="black" fill="black">
                         {points}
                         {ghostPoint}
+                        {lines}
+                        <Poly 
+                            data={this.state.points}
+                            k={1}
+                        />
                     </g> 
-                    {lines}
-                    <Poly 
-                    data={this.state.points}
-                    k={1}
-                    />
+                    
+                    
                 </svg>
                 <form onSubmit={this.handleSubmit}>
                     <input type="number" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
@@ -164,8 +179,8 @@ class CanvasComponent extends React.Component {
 }
 
 ReactDOM.render(<CanvasComponent 
-                    height="1000"
-                    width="1500"/>, document.getElementById('root'));
+                    height="500"
+                    width="1000"/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
