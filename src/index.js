@@ -9,10 +9,11 @@ import './index.css';
 class CanvasComponent extends React.Component {
     constructor (props) {
         super(props);
+        
         this.state = {
             points: [
-                {x: 0, y: 0},
-                {x: props.width, y: 0}
+                {x: props.padding/2, y: props.padding/2},
+                {x: props.width-props.padding/2, y: props.padding/2}
             ],
             x: "",
             y: "",
@@ -35,14 +36,18 @@ class CanvasComponent extends React.Component {
     }
 
     handleMouseDown(id) {
-        this.setState({selected: id});
+        if(id === 0 || id === this.state.points.length-1){
+            return;
+        } 
+        let copyPoint = {x: this.state.points[id].x, y: this.state.points[id]};
+        this.setState({
+            selected: id,
+            copyPoint: copyPoint,
+        });
         this.startDrag(id);
     }
 
     startDrag(id) {
-        if(id === 0 || id === this.state.points.length-1){
-            return;
-        } 
         let copyPoint = this.state.points[id];
         this.setState({
             copyPoint: <PointComponent fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />
@@ -53,13 +58,19 @@ class CanvasComponent extends React.Component {
         if(this.state.copyPoint === undefined){
             return
         }
+        let updatedCopyPoint;
         let y;
+        let x = event.screenX-this.state.startingX;
         if(event.screenY > this.state.boxBottom){
             y = (this.state.boxBottom + 100) - event.screenY;
         } else {
             y = this.state.boxBottom - event.screenY + 100;
         }
-        let updatedCopyPoint = {x: event.screenX-this.state.startingX, y: y};
+
+        if( x < 100 || x > 1100 || y > 600 || y < 100) {
+            return;
+        }
+        updatedCopyPoint = {x: x, y: y};
         this.setState({
             updatedX: updatedCopyPoint.x,
             updatedY: updatedCopyPoint.y,
@@ -107,7 +118,10 @@ class CanvasComponent extends React.Component {
     handlePointUpdate(event) {
         let selected = this.state.selected;
         if(selected === undefined || selected === 0 || selected === this.state.points.length-1) {
-            this.setState({selected: undefined});
+            this.setState({
+                selected: undefined,
+                copyPoint: undefined,
+            });
             return
         }
         let updatedPoint = {x: this.state.updatedX, y: this.state.updatedY};
@@ -144,8 +158,12 @@ class CanvasComponent extends React.Component {
     }
 
     normalizePoint(point) {
-        let normalizedX = point.x*this.props.width;
-        let normalizedY = point.y*this.props.height;
+        let min = this.props.padding/2;
+        let maxX = this.props.width-min;
+        let maxY = this.props.height-min; 
+        let normalizedX = (point.x*(maxX-min))+min; 
+        let normalizedY = (point.y*(maxY-min))+min;
+
         return {x:normalizedX, y:normalizedY};
     }
 
@@ -168,19 +186,23 @@ class CanvasComponent extends React.Component {
         return (
             <div>
                 <svg ref={this.refCallBack} height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
-                    <g  transform="matrix(1 0 0 -1 0 500)" stroke="black" fill="black">
+                    <g  transform="matrix(1 0 0 -1 0 700)" stroke="black" fill="black">
                         {points}
                         {ghostPoint}
                         {lines}
                         <Poly data={this.state.points} k={0.5}/>
+
+                        <line x1="100" x2="1100" y1="100" y2="100" stroke="black" strokeWidth="5" strokeLinecap="square"/>
+                        <line x1="100" x2="1100" y1="600" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
+                        <line x1="100" x2="100" y1="100" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
+                        <line x1="1100" x2="1100" y1="100" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
                     </g> 
-                    
                     
                 </svg>
                 <hr />
                 <form onSubmit={this.handleSubmit}>
-                    <input type="number" min="0" max="1" step="0.01" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" />
-                    <input type="number" min="0" max="1" step="0.01" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" />
+                    <input type="number" min="0" max="1" step="0.01" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" required/>
+                    <input type="number" min="0" max="1" step="0.01" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" required/>
                     <input type="submit" value="Add"/>
                 </form>
             </div>
@@ -190,8 +212,8 @@ class CanvasComponent extends React.Component {
 }
 
 ReactDOM.render(<CanvasComponent 
-                    height="500"
-                    width="1000"
+                    height="700"
+                    width="1200"
                     padding="200" />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

@@ -18,6 +18,9 @@ div {
 }
 
 svg { 
-  border-left: 1px solid black;
-  border-bottom: 1px solid black;
+  border: 1px solid black;
+}
+
+form {
+  margin-left: 7.5em;
 }
