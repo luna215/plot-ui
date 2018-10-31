@@ -14,8 +14,8 @@ class CanvasComponent extends React.Component {
                 {x: 0, y: 0},
                 {x: props.width, y: 0}
             ],
-            x: undefined,
-            y: undefined,
+            x: "",
+            y: "",
             selected: undefined,
             copyPoint: undefined,
             startingX: 0,
@@ -25,10 +25,10 @@ class CanvasComponent extends React.Component {
             boxBottom: 0,
         };
 
+        this.handleMouseDown = this.handleMouseDown.bind(this);
         this.startDrag = this.startDrag.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
-        this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -40,6 +40,9 @@ class CanvasComponent extends React.Component {
     }
 
     startDrag(id) {
+        if(id === 0 || id === this.state.points.length-1){
+            return;
+        } 
         let copyPoint = this.state.points[id];
         this.setState({
             copyPoint: <PointComponent fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />
@@ -102,7 +105,9 @@ class CanvasComponent extends React.Component {
     }   
 
     handlePointUpdate(event) {
-        if(this.state.selected === undefined) {
+        let selected = this.state.selected;
+        if(selected === undefined || selected === 0 || selected === this.state.points.length-1) {
+            this.setState({selected: undefined});
             return
         }
         let updatedPoint = {x: this.state.updatedX, y: this.state.updatedY};
@@ -132,8 +137,8 @@ class CanvasComponent extends React.Component {
         points.sort((a, b) => a.x - b.x);
         this.setState({
             points: points,
-            x: undefined,
-            y: undefined,
+            x: "",
+            y: "",
         });
         event.preventDefault();
     }
@@ -186,7 +191,8 @@ class CanvasComponent extends React.Component {
 
 ReactDOM.render(<CanvasComponent 
                     height="500"
-                    width="1000"/>, document.getElementById('root'));
+                    width="1000"
+                    padding="200" />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
