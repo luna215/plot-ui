@@ -12,8 +12,9 @@ class CanvasComponent extends React.Component {
         
         this.state = {
             points: [
-                {x: props.padding/2, y: props.padding/2},
-                {x: props.width-props.padding/2, y: props.padding/2}
+                {x: 0, y: 0},
+                {x: 0.1, y: 0.1},
+                {x: 1, y: 0}
             ],
             x: "",
             y: "",
@@ -27,7 +28,6 @@ class CanvasComponent extends React.Component {
         };
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
-        this.startDrag = this.startDrag.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
@@ -39,20 +39,12 @@ class CanvasComponent extends React.Component {
         if(id === 0 || id === this.state.points.length-1){
             return;
         } 
-        let copyPoint = {x: this.state.points[id].x, y: this.state.points[id].y};
+        let copyPoint = this.normalizePoint({x: this.state.points[id].x, y: this.state.points[id].y});
         this.setState({
             selected: id,
-            copyPoint: copyPoint,
+            copyPoint: <PointComponent fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />,
             updatedX: copyPoint.x,
             updatedY: copyPoint.y,
-        });
-        this.startDrag(id);
-    }
-
-    startDrag(id) {
-        let copyPoint = this.state.points[id];
-        this.setState({
-            copyPoint: <PointComponent fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />
         });
     }
 
@@ -84,38 +76,39 @@ class CanvasComponent extends React.Component {
 
     renderPoints() {
         let points = [];
-        
+        let point;
         for (let i = 0; i < this.state.points.length; i++){
+            point = this.normalizePoint(this.state.points[i]);
             points.push(<PointComponent
                             key={i}
                             id={i}
-                            x={this.state.points[i].x} 
-                            y={this.state.points[i].y}
+                            x={point.x} 
+                            y={point.y}
                             onMouseDown={() => this.handleMouseDown(i)}
                         />);
         }
         return points;
     }
 
-    renderLines() {
-        const numberOfLines = this.state.points.length - 1;
-        let start;
-        let end;
-        let lines = [];
+    // renderLines() {
+    //     const numberOfLines = this.state.points.length - 1;
+    //     let start;
+    //     let end;
+    //     let lines = [];
 
-        for (let i = 0; i < numberOfLines; i++){
-            start = {x: this.state.points[i].x, y: this.state.points[i].y};
-            end = {x: this.state.points[i+1].x-start.x, y: this.state.points[i+1].y-start.y};
-            lines.push(<Path 
-                            startX={start.x} 
-                            startY={start.y} 
-                            endX={end.x} 
-                            endY={end.y}
-                            key={i}
-                        />);
-        }
-        return lines;
-    }   
+    //     for (let i = 0; i < numberOfLines; i++){
+    //         start = {x: this.state.points[i].x, y: this.state.points[i].y};
+    //         end = {x: this.state.points[i+1].x-start.x, y: this.state.points[i+1].y-start.y};
+    //         lines.push(<Path 
+    //                         startX={start.x} 
+    //                         startY={start.y} 
+    //                         endX={end.x} 
+    //                         endY={end.y}
+    //                         key={i}
+    //                     />);
+    //     }
+    //     return lines;
+    // }   
 
     handlePointUpdate(event) {
         let selected = this.state.selected;
@@ -126,7 +119,7 @@ class CanvasComponent extends React.Component {
             });
             return
         }
-        let updatedPoint = {x: this.state.updatedX, y: this.state.updatedY};
+        let updatedPoint = this.unNormalizePoint({x: this.state.updatedX, y: this.state.updatedY});
         let points = this.state.points.filter((_,i) => i !== this.state.selected);
         points.push(updatedPoint);;
         points.sort((a, b) => a.x - b.x);
@@ -148,7 +141,6 @@ class CanvasComponent extends React.Component {
     handleSubmit(event) {
         let newPoint = {x: this.state.x, y: this.state.y};
         let points = this.state.points.slice();
-        newPoint = this.normalizePoint(newPoint);
         points.push(newPoint);
         points.sort((a, b) => a.x - b.x);
         this.setState({
@@ -169,6 +161,16 @@ class CanvasComponent extends React.Component {
         return {x:normalizedX, y:normalizedY};
     }
 
+    unNormalizePoint(point) {
+        let min = this.props.padding/2;
+        let maxX = this.props.width-min; 
+        let maxY = this.props.height-min;
+        let unNormalizedX = (point.x-min)/(maxX-min);
+        let unNormalizedY = (point.y-min)/(maxY-min);
+        
+        return {x: unNormalizedX, y: unNormalizedY};
+    }
+
     refCallBack(element) {
         if(element){
             this.setState({
@@ -181,7 +183,7 @@ class CanvasComponent extends React.Component {
 
     render() {
         let points = this.renderPoints();
-        let lines = this.renderLines();
+        // let lines = this.renderLines();
         let ghostPoint = this.state.copyPoint;
 
         return (
@@ -191,8 +193,13 @@ class CanvasComponent extends React.Component {
                     <g  transform="matrix(1 0 0 -1 0 700)" stroke="black" fill="black">
                         {points}
                         {ghostPoint}
-                        {lines}
-                        <Poly data={this.state.points} k={0.5}/>
+                        {/* {lines} */}
+                        <Poly 
+                            data={this.state.points} 
+                            k={0.5}
+                            height={this.props.height}
+                            width={this.props.width}
+                            padding={this.props.padding}/>
                         {points}
 
                         <line x1="100" x2="1100" y1="100" y2="100" stroke="black" strokeWidth="5" strokeLinecap="square"/>
@@ -261,13 +268,32 @@ ReactDOM.render(<CanvasComponent
 // Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
 
-function Path(props) {
-    return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
-}
+// function Path(props) {
+//     return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
+// }
 
 function Poly(props) {
+
+    let points = [];
+    let min;
+    let maxX;
+    let maxY;
+    let normalizedX;
+    let normalizedY;
+    let point;
+
+    for(let i = 0; i < props.data.length; i++){
+        point = props.data[i];
+        min = props.padding/2;
+        maxX = props.width-min;
+        maxY = props.height-min; 
+        normalizedX = (point.x*(maxX-min))+min; 
+        normalizedY = (point.y*(maxY-min))+min;
+        points.push({x: normalizedX, y: normalizedY});
+    }
+
     if (props.k == null) props.k = 0.5;
-    let data = props.data;
+    let data = points;
     let size = data.length;
     let last = size - 2;
     let path = "M" + [data[0].x, data[0].y];
