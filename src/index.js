@@ -170,7 +170,6 @@ class CanvasComponent extends React.Component {
     }
 
     refCallBack(element) {
-        console.log(element.getBoundingClientRect());
         if(element){
             this.setState({
                 startingX: element.getBoundingClientRect().x,
@@ -188,11 +187,13 @@ class CanvasComponent extends React.Component {
         return (
             <div>
                 <svg ref={this.refCallBack} height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
+                    <text x="100" y="90">Control Points</text>
                     <g  transform="matrix(1 0 0 -1 0 700)" stroke="black" fill="black">
                         {points}
                         {ghostPoint}
                         {lines}
                         <Poly data={this.state.points} k={0.5}/>
+                        {points}
 
                         <line x1="100" x2="1100" y1="100" y2="100" stroke="black" strokeWidth="5" strokeLinecap="square"/>
                         <line x1="100" x2="1100" y1="600" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
@@ -228,18 +229,17 @@ class CanvasComponent extends React.Component {
 
                      <defs>
                         <linearGradient id="Gradient">
-                            <stop offset="0%" stop-color="#d30000"/>
-                            <stop offset="30%" stop-color="#ffff05"/>
-                            <stop offset="50%" stop-color="#05ff05"/>
-                            <stop offset="70%" stop-color="#05ffff"/>
-                            <stop offset="100%" stop-color="#041ae0"/>
+                            <stop offset="0%" stopColor="#d30000"/>
+                            <stop offset="30%" stopColor="#ffff05"/>
+                            <stop offset="50%" stopColor="#05ff05"/>
+                            <stop offset="70%" stopColor="#05ffff"/>
+                            <stop offset="100%" stopColor="#041ae0"/>
                         </linearGradient>
                     </defs>
  
                     <rect id="rect1" x="100" y="650" rx="15" ry="15" width="1000" height="30" fill="url(#Gradient)"/>
                     
                 </svg>
-                <hr />
                 <form onSubmit={this.handleSubmit}>
                     <input type="number" min="0" max="1" step="0.01" name="x" value={this.state.x} onChange={this.handlePointsUpdate} placeholder="X" required/>
                     <input type="number" min="0" max="1" step="0.01" name="y" value={this.state.y} onChange={this.handlePointsUpdate} placeholder="Y" required/>
