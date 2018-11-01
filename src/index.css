@@ -21,16 +21,33 @@ svg {
   border: 1px solid black;
 }
 
-path {
-  z-index: 0;
-}
-
-circle {
-  z-index: 1;
+circle:hover {
+  fill:orange;
+  stroke:black;
+  stroke-width:5px;
 }
 
 form {
   margin-left: 7.5em;
+}
+
+.flip {
+  display: inline; 
+}
+
+.info {
+  fill: white;
+  stroke: black;
+  stroke-width: 5px;
+  
+}
+
+.show {
+  visibility: visible;
+}
+
+.hide {
+  visibility: hidden;
 }
 
 text {

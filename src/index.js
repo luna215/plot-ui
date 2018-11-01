@@ -14,6 +14,7 @@ class CanvasComponent extends React.Component {
             points: [
                 {x: 0, y: 0},
                 {x: 0.1, y: 0.1},
+                {x: 0.6, y: 0.8},
                 {x: 1, y: 0}
             ],
             x: "",
@@ -42,7 +43,7 @@ class CanvasComponent extends React.Component {
         let copyPoint = this.normalizePoint({x: this.state.points[id].x, y: this.state.points[id].y});
         this.setState({
             selected: id,
-            copyPoint: <PointComponent fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />,
+            copyPoint: <PointComponent key="copy" x={copyPoint.x} y={copyPoint.y} />,
             updatedX: copyPoint.x,
             updatedY: copyPoint.y,
         });
@@ -189,6 +190,8 @@ class CanvasComponent extends React.Component {
         return (
             <div>
                 <svg ref={this.refCallBack} height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
+
+                    
                     <text x="100" y="90">Control Points</text>
                     <g  transform="matrix(1 0 0 -1 0 700)" stroke="black" fill="black">
                         {points}
