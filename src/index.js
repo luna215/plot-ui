@@ -39,10 +39,12 @@ class CanvasComponent extends React.Component {
         if(id === 0 || id === this.state.points.length-1){
             return;
         } 
-        let copyPoint = {x: this.state.points[id].x, y: this.state.points[id]};
+        let copyPoint = {x: this.state.points[id].x, y: this.state.points[id].y};
         this.setState({
             selected: id,
             copyPoint: copyPoint,
+            updatedX: copyPoint.x,
+            updatedY: copyPoint.y,
         });
         this.startDrag(id);
     }
@@ -196,7 +198,45 @@ class CanvasComponent extends React.Component {
                         <line x1="100" x2="1100" y1="600" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
                         <line x1="100" x2="100" y1="100" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
                         <line x1="1100" x2="1100" y1="100" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
-                    </g> 
+                    </g>
+                    <g className="x-labels">
+                        <text x="100" y="630">0</text>
+                        <text x="190" y="630">0.1</text>
+                        <text x="290" y="630">0.2</text>
+                        <text x="390" y="630">0.3</text>
+                        <text x="490" y="630">0.4</text>
+                        <text x="590" y="630">0.5</text>
+                        <text x="690" y="630">0.6</text>
+                        <text x="790" y="630">0.7</text>
+                        <text x="890" y="630">0.8</text>
+                        <text x="990" y="630">0.9</text>
+                        <text x="1090" y="630">1</text>
+                    </g>
+                    <g className="y-labels">
+                        <text x="60" y="600">0</text>
+                        <text x="60" y="550">0.1</text>
+                        <text x="60" y="500">0.2</text>
+                        <text x="60" y="450">0.3</text>
+                        <text x="60" y="400">0.4</text>
+                        <text x="60" y="350">0.5</text>
+                        <text x="60" y="300">0.6</text>
+                        <text x="60" y="250">0.7</text>
+                        <text x="60" y="200">0.8</text>
+                        <text x="60" y="150">0.9</text>
+                        <text x="60" y="100">1</text>
+                    </g>
+
+                     <defs>
+                        <linearGradient id="Gradient">
+                            <stop offset="0%" stop-color="#d30000"/>
+                            <stop offset="30%" stop-color="#ffff05"/>
+                            <stop offset="50%" stop-color="#05ff05"/>
+                            <stop offset="70%" stop-color="#05ffff"/>
+                            <stop offset="100%" stop-color="#041ae0"/>
+                        </linearGradient>
+                    </defs>
+ 
+                    <rect id="rect1" x="100" y="650" rx="15" ry="15" width="1000" height="30" fill="url(#Gradient)"/>
                     
                 </svg>
                 <hr />
