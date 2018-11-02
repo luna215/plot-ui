@@ -91,26 +91,6 @@ class CanvasComponent extends React.Component {
         return points;
     }
 
-    // renderLines() {
-    //     const numberOfLines = this.state.points.length - 1;
-    //     let start;
-    //     let end;
-    //     let lines = [];
-
-    //     for (let i = 0; i < numberOfLines; i++){
-    //         start = {x: this.state.points[i].x, y: this.state.points[i].y};
-    //         end = {x: this.state.points[i+1].x-start.x, y: this.state.points[i+1].y-start.y};
-    //         lines.push(<Path 
-    //                         startX={start.x} 
-    //                         startY={start.y} 
-    //                         endX={end.x} 
-    //                         endY={end.y}
-    //                         key={i}
-    //                     />);
-    //     }
-    //     return lines;
-    // }   
-
     handlePointUpdate(event) {
         let selected = this.state.selected;
         if(selected === undefined || selected === 0 || selected === this.state.points.length-1) {
@@ -196,7 +176,6 @@ class CanvasComponent extends React.Component {
                     <g  transform="matrix(1 0 0 -1 0 700)" stroke="black" fill="black">
                         {points}
                         {ghostPoint}
-                        {/* {lines} */}
                         <Poly 
                             data={this.state.points} 
                             k={0.5}
@@ -270,10 +249,6 @@ ReactDOM.render(<CanvasComponent
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: http://bit.ly/CRA-PWA
 serviceWorker.unregister();
-
-// function Path(props) {
-//     return <path d={"M " + props.startX + " " + props.startY + " l " + props.endX + " " + props.endY}  stroke="#888"/>
-// }
 
 function Poly(props) {
 
