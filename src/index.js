@@ -14,6 +14,7 @@ class CanvasComponent extends React.Component {
             points: [
                 {x: 0, y: 0},
                 {x: 0.1, y: 0.1},
+                {x: 0.6, y: 0.5},
                 {x: 0.6, y: 0.8},
                 {x: 1, y: 0}
             ],
@@ -43,7 +44,7 @@ class CanvasComponent extends React.Component {
         let copyPoint = this.normalizePoint({x: this.state.points[id].x, y: this.state.points[id].y});
         this.setState({
             selected: id,
-            copyPoint: <PointComponent key="copy" x={copyPoint.x} y={copyPoint.y} />,
+            copyPoint: <PointComponent  fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />,
             updatedX: copyPoint.x,
             updatedY: copyPoint.y,
         });
@@ -54,15 +55,13 @@ class CanvasComponent extends React.Component {
             return
         }
         let updatedCopyPoint;
-        let y;
-        let x = event.screenX-this.state.startingX;
-        if(event.screenY > this.state.boxBottom){
-            y = (this.state.boxBottom + 100) - event.screenY;
-        } else {
-            y = this.state.boxBottom - event.screenY + 100;
-        }
+        let x = event.screenX-this.state.startingX;      
+        let y = this.props.height - (this.state.boxBottom - event.screenY + 100);
 
-        if( x < 100 || x > 1100 || y > 600 || y < 100) {
+        if( x < (this.props.padding/2) || 
+            x > (this.props.width-(this.props.padding/2)) || 
+            y > (this.props.height-(this.props.padding/2)) || 
+            y < (this.props.padding/2)) {
             return;
         }
         updatedCopyPoint = {x: x, y: y};
@@ -71,24 +70,8 @@ class CanvasComponent extends React.Component {
             updatedY: updatedCopyPoint.y,
         });
         this.setState({
-            copyPoint: <PointComponent fill="blue" key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} />
+            copyPoint: <PointComponent key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} />
         });
-    }
-
-    renderPoints() {
-        let points = [];
-        let point;
-        for (let i = 0; i < this.state.points.length; i++){
-            point = this.normalizePoint(this.state.points[i]);
-            points.push(<PointComponent
-                            key={i}
-                            id={i}
-                            x={point.x} 
-                            y={point.y}
-                            onMouseDown={() => this.handleMouseDown(i)}
-                        />);
-        }
-        return points;
     }
 
     handlePointUpdate(event) {
@@ -138,8 +121,9 @@ class CanvasComponent extends React.Component {
         let maxY = this.props.height-min; 
         let normalizedX = (point.x*(maxX-min))+min; 
         let normalizedY = (point.y*(maxY-min))+min;
+        let reverseY = this.props.height-normalizedY
 
-        return {x:normalizedX, y:normalizedY};
+        return {x:normalizedX, y:reverseY};
     }
 
     unNormalizePoint(point) {
@@ -147,12 +131,18 @@ class CanvasComponent extends React.Component {
         let maxX = this.props.width-min; 
         let maxY = this.props.height-min;
         let unNormalizedX = (point.x-min)/(maxX-min);
-        let unNormalizedY = (point.y-min)/(maxY-min);
+
+        // we have to take into account that we reversed y when we first normalized it.
+        let unNormalizedY = (this.props.height-point.y-min)/(maxY-min); 
         
+        console.log("x: " + unNormalizedX);
+        console.log("y: " + unNormalizedY);
+
         return {x: unNormalizedX, y: unNormalizedY};
     }
 
     refCallBack(element) {
+        console.log(element.getBoundingClientRect());
         if(element){
             this.setState({
                 startingX: element.getBoundingClientRect().x,
@@ -162,6 +152,22 @@ class CanvasComponent extends React.Component {
         }
     }
 
+    renderPoints() {
+        let points = [];
+        let point;
+        for (let i = 0; i < this.state.points.length; i++){
+            point = this.normalizePoint(this.state.points[i]);
+            points.push(<PointComponent
+                            key={i}
+                            id={i}
+                            x={point.x} 
+                            y={point.y}
+                            onMouseDown={() => this.handleMouseDown(i)}
+                        />);
+        }
+        return points;
+    }
+
     render() {
         let points = this.renderPoints();
         // let lines = this.renderLines();
@@ -169,13 +175,12 @@ class CanvasComponent extends React.Component {
 
         return (
             <div>
-                <svg ref={this.refCallBack} height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
+                <svg ref={this.refCallBack} viewBox="0 0 1200 700" height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
 
                     
                     <text x="100" y="90">Control Points</text>
-                    <g  transform="matrix(1 0 0 -1 0 700)" stroke="black" fill="black">
-                        {points}
-                        {ghostPoint}
+                    {/* <g transform="translate(0, 700) scale(1, -1)" stroke="black" fill="black"> */}
+                    <g stroke="black" fill="black">
                         <Poly 
                             data={this.state.points} 
                             k={0.5}
@@ -183,6 +188,8 @@ class CanvasComponent extends React.Component {
                             width={this.props.width}
                             padding={this.props.padding}/>
                         {points}
+                        {ghostPoint}
+                        
 
                         <line x1="100" x2="1100" y1="100" y2="100" stroke="black" strokeWidth="5" strokeLinecap="square"/>
                         <line x1="100" x2="1100" y1="600" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
@@ -258,6 +265,7 @@ function Poly(props) {
     let maxY;
     let normalizedX;
     let normalizedY;
+    let reverseY;
     let point;
 
     for(let i = 0; i < props.data.length; i++){
@@ -267,7 +275,8 @@ function Poly(props) {
         maxY = props.height-min; 
         normalizedX = (point.x*(maxX-min))+min; 
         normalizedY = (point.y*(maxY-min))+min;
-        points.push({x: normalizedX, y: normalizedY});
+        reverseY = props.height-normalizedY;
+        points.push({x: normalizedX, y: reverseY});
     }
 
     if (props.k == null) props.k = 0.5;

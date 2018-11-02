@@ -29,13 +29,14 @@ export default class PointComponent extends React.Component {
                     onMouseEnter={this.handleHover} 
                     onMouseLeave={this.handleHoverOff}
                     onMouseDown={this.props.onMouseDown}
-                    fill={this.state.fill}
+                    fill={this.props.fill}
                 />, 
                 <PointInfoComponent 
                     x={this.props.x} 
                     y={this.props.y}
-                    width={100}
-                    height={100}
+                    key={this.props.id}
+                    width={70}
+                    height={60}
                     show={this.state.show}
                 />
             ]);
@@ -44,15 +45,17 @@ export default class PointComponent extends React.Component {
 }
 
 class PointInfoComponent extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
+    // constructor(props) {
+    //     super(props);
+    // }
+    
     render() {
         return [
-            <rect x={15+this.props.x} y={15+this.props.y} width={this.props.width} height={this.props.height} ry="15" rx="15" className={this.props.show ? "show info" : "hide"} />,
-            <text className={this.props.show ? "show flip" : "hide"} x={this.props.x+20} y={this.props.y+this.props.height}>x: {this.props.x}</text>,
-            <text className={this.props.show ? "show flip" : "hide"} x={this.props.x+20} y={this.props.y+this.props.height-20}>y: {this.props.y}</text>      
+            // <rect x={15+this.props.x} y={15+this.props.y} width={this.props.width} height={this.props.height} ry="15" rx="15" className={this.props.show ? "show info" : "show info"} />,
+            <rect id={this.props.id} x={10} y={10} width={this.props.width} height={this.props.height} ry="15" rx="15" className={this.props.show ? "show info" : "hide"} />,
+            <text id={"x"+this.props.id} className={this.props.show ? "show" : "hide"} x="15" y="25">x: {this.props.x}</text>,
+            <text id={"y"+this.props.id} className={this.props.show ? "show " : "hide"} x="15" y="50">y: {this.props.y}</text>
+              
         ]
     }
 }
