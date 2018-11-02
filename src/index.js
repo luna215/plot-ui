@@ -31,6 +31,7 @@ class CanvasComponent extends React.Component {
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
@@ -44,7 +45,7 @@ class CanvasComponent extends React.Component {
         let copyPoint = this.normalizePoint({x: this.state.points[id].x, y: this.state.points[id].y});
         this.setState({
             selected: id,
-            copyPoint: <PointComponent  fill="blue" key="copy" x={copyPoint.x} y={copyPoint.y} />,
+            copyPoint: <PointComponent key="copy" x={copyPoint.x} y={copyPoint.y} />,
             updatedX: copyPoint.x,
             updatedY: copyPoint.y,
         });
@@ -116,6 +117,26 @@ class CanvasComponent extends React.Component {
         event.preventDefault();
     }
 
+    handleDoubleClick(event) {
+        let newPoint;
+        let x = event.screenX-this.state.startingX;      
+        let y = this.props.height - (this.state.boxBottom - event.screenY + 100);
+        let points = this.state.points;
+
+        if( x < (this.props.padding/2) || 
+            x > (this.props.width-(this.props.padding/2)) || 
+            y > (this.props.height-(this.props.padding/2)) || 
+            y < (this.props.padding/2)) {
+            return;
+        }
+        newPoint = this.unNormalizePoint({x: x, y: y});
+        points.push(newPoint);
+        points.sort((a, b) => a.x -b.x);
+        this.setState({
+            points: points,
+        })
+        event.preventDefault();
+    }
     normalizePoint(point) {
         let min = this.props.padding/2;
         let maxX = this.props.width-min;
@@ -174,7 +195,14 @@ class CanvasComponent extends React.Component {
 
         return (
             <div>
-                <svg ref={this.refCallBack} viewBox="0 0 1200 700" height={this.props.height} width={this.props.width} onMouseMove={this.handleDrag} onMouseUp={this.handlePointUpdate}>  
+                <svg 
+                    ref={this.refCallBack} 
+                    viewBox="0 0 1200 700" 
+                    height={this.props.height} 
+                    width={this.props.width} 
+                    onMouseMove={this.handleDrag} 
+                    onMouseUp={this.handlePointUpdate}
+                    onDoubleClick={this.handleDoubleClick}>  
 
                     
                     <text x="100" y="90">Control Points</text>
