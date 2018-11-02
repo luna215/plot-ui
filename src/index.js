@@ -140,7 +140,6 @@ class CanvasComponent extends React.Component {
     }
 
     refCallBack(element) {
-        console.log(element.getBoundingClientRect());
         if(element){
             this.setState({
                 startingX: element.getBoundingClientRect().x,
