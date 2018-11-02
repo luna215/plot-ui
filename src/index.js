@@ -69,8 +69,9 @@ class CanvasComponent extends React.Component {
             updatedX: updatedCopyPoint.x,
             updatedY: updatedCopyPoint.y,
         });
+        let unNormalizePoint = this.unNormalizePoint(updatedCopyPoint);
         this.setState({
-            copyPoint: <PointComponent key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} />
+            copyPoint: <PointComponent key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} nX={unNormalizePoint.x} nY={unNormalizePoint.y}/>
         });
     }
 
@@ -134,9 +135,6 @@ class CanvasComponent extends React.Component {
 
         // we have to take into account that we reversed y when we first normalized it.
         let unNormalizedY = (this.props.height-point.y-min)/(maxY-min); 
-        
-        console.log("x: " + unNormalizedX);
-        console.log("y: " + unNormalizedY);
 
         return {x: unNormalizedX, y: unNormalizedY};
     }
@@ -162,6 +160,8 @@ class CanvasComponent extends React.Component {
                             id={i}
                             x={point.x} 
                             y={point.y}
+                            nX={this.state.points[i].x}
+                            nY={this.state.points[i].y}
                             onMouseDown={() => this.handleMouseDown(i)}
                         />);
         }
