@@ -49,10 +49,6 @@ export default class PointComponent extends React.Component {
 }
 
 class PointInfoComponent extends React.Component {
-    // constructor(props) {
-    //      super(props);
-    // }
-
     render() {
         
         return [

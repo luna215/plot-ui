@@ -6,6 +6,18 @@ import * as serviceWorker from './serviceWorker';
 import PointComponent from './PointComponent';
 import './index.css';
 
+class InfoComponent extends React.Component {
+    render() {
+        return (
+            <g>
+                <circle className="infoCircle" r="15" cx="1100" cy="80" fill="white" stroke="black"/>
+                <text className="medium" x="1097" y="90">i</text> 
+                
+            </g>
+        );
+    }
+}
+
 class CanvasComponent extends React.Component {
     constructor (props) {
         super(props);
@@ -194,7 +206,7 @@ class CanvasComponent extends React.Component {
         let ghostPoint = this.state.copyPoint;
 
         return (
-            <div>
+            <div>                
                 <svg 
                     ref={this.refCallBack} 
                     viewBox="0 0 1200 700" 
@@ -206,6 +218,8 @@ class CanvasComponent extends React.Component {
 
                     
                     <text x="100" y="90">Control Points</text>
+                    <InfoComponent/>
+                    
                     {/* <g transform="translate(0, 700) scale(1, -1)" stroke="black" fill="black"> */}
                     <g stroke="black" fill="black">
                         <Poly 
@@ -334,5 +348,5 @@ function Poly(props) {
         path += "C" + [cp1x, cp1y, cp2x, cp2y, x2, y2];
     }
 
-    return <path d={path} stroke="red" fill="none"/>
+    return <path d={path} strokeWidth="3" stroke="#339999" fill="none"/>
 }
