@@ -98,7 +98,12 @@ class CanvasComponent extends React.Component {
         let updatedPoint = this.unNormalizePoint({x: this.state.updatedX, y: this.state.updatedY});
         let points = this.state.points.filter((_,i) => i !== this.state.selected);
         points.push(updatedPoint);;
-        points.sort((a, b) => a.x - b.x);
+        points.sort((a, b) => { 
+            if(a.x === b.x){
+                return a.y-b.y;
+            }
+            return a.x - b.x
+        });
         this.setState({
             points: points,
             selected: undefined,
@@ -118,7 +123,12 @@ class CanvasComponent extends React.Component {
         let newPoint = {x: this.state.x, y: this.state.y};
         let points = this.state.points.slice();
         points.push(newPoint);
-        points.sort((a, b) => a.x - b.x);
+        points.sort((a, b) => { 
+            if(a.x === b.x){
+                return a.y-b.y;
+            }
+            return a.x - b.x
+        });
         this.setState({
             points: points,
             x: "",
@@ -167,7 +177,12 @@ class CanvasComponent extends React.Component {
         }
         newPoint = this.unNormalizePoint({x: x, y: y});
         points.push(newPoint);
-        points.sort((a, b) => a.x -b.x);
+        points.sort((a, b) => { 
+            if(a.x === b.x){
+                return b.y-a.y;
+            }
+            return a.x - b.x
+        });
         this.setState({
             points: points,
         })
@@ -345,6 +360,12 @@ function Poly(props) {
         normalizedY = (point.y*(maxY-min))+min;
         reverseY = props.height-normalizedY;
         points.push({x: normalizedX, y: reverseY});
+        points.sort((a, b) => { 
+            if(a.x === b.x){
+                return a.y-b.y;
+            }
+            return a.x - b.x
+        });
     }
 
     if (props.k == null) props.k = 0.5;
