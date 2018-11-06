@@ -21,6 +21,7 @@ class CanvasComponent extends React.Component {
                 {x: 0.6, y: 0.8},
                 {x: 1, y: 0}
             ],
+            selectedPoint: undefined,
             x: "",
             y: "",
             selected: undefined,
@@ -34,7 +35,8 @@ class CanvasComponent extends React.Component {
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
-        this.handleClick = this.handleClick.bind(this);
+        this.handleClickPoint = this.handleClickPoint.bind(this);
+        this.handleClickCanvas = this.handleClickCanvas.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
@@ -42,7 +44,7 @@ class CanvasComponent extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleMouseDown(id, event) {
+    handleMouseDown(event, id) {
         if(id === 0 || id === this.state.points.length-1){
             return;
         } 
@@ -53,6 +55,8 @@ class CanvasComponent extends React.Component {
             updatedX: copyPoint.x,
             updatedY: copyPoint.y,
         });
+
+        event.preventDefault();
     }
 
     handleDrag(event) {
@@ -123,10 +127,32 @@ class CanvasComponent extends React.Component {
         event.preventDefault();
     }
 
-    handleClick(i){
-        console.log("You clicked: " + i);
+    handleClickPoint(event, i){
+        let selectedPointX = this.state.points[i].x;
+        let selectedPointY = this.state.points[i].y;
+        let normalizePoint = this.normalizePoint({x: selectedPointX, y: selectedPointY});
+        let selectedPoint = <PointComponent
+                            key={i}
+                            id={i}
+                            x={normalizePoint.x} 
+                            y={normalizePoint.y}
+                            nX={selectedPointX}
+                            nY={selectedPointY}
+                            selected={true}
+                            onMouseDown={() => this.handleMouseDown(i)}
+                            onClick={() => this.handleClickPoint(i)}
+                        />
+
+        this.setState({
+            selectedPoint: selectedPoint
+        });
+
+        event.stopPropagation();
     }
     
+    handleClickCanvas() {
+        this.setState({selectedPoint: undefined});
+    }
     handleDoubleClick(event) {
         let newPoint;
         let x = event.screenX-this.state.startingX;      
@@ -147,6 +173,7 @@ class CanvasComponent extends React.Component {
         })
         event.preventDefault();
     }
+
     normalizePoint(point) {
         let min = this.props.padding/2;
         let maxX = this.props.width-min;
@@ -192,8 +219,9 @@ class CanvasComponent extends React.Component {
                             y={point.y}
                             nX={this.state.points[i].x}
                             nY={this.state.points[i].y}
-                            onMouseDown={() => this.handleMouseDown(i)}
-                            onClick={() => this.handleClick(i)}
+                            selected={false}
+                            onMouseDown={(event) => this.handleMouseDown(event, i)}
+                            onClick={(event) => this.handleClickPoint(event, i)}
                         />);
         }
         return points;
@@ -202,6 +230,7 @@ class CanvasComponent extends React.Component {
     render() {
         let points = this.renderPoints();
         let ghostPoint = this.state.copyPoint;
+        let selectedPoint = this.state.selectedPoint;
 
         return (
             <div>                
@@ -212,6 +241,7 @@ class CanvasComponent extends React.Component {
                     width={this.props.width}
                     onMouseMove={this.handleDrag} 
                     onMouseUp={this.handlePointUpdate}
+                    onClick={this.handleClickCanvas}
                     onDoubleClick={this.handleDoubleClick}>  
                     <text x="100" y="90">Control Points</text>
                     <InfoComponent/>
@@ -226,6 +256,7 @@ class CanvasComponent extends React.Component {
                             padding={this.props.padding}/>
                         {points}
                         {ghostPoint}
+                        {selectedPoint}
                         
 
                         <line x1="100" x2="1100" y1="100" y2="100" stroke="black" strokeWidth="5" strokeLinecap="square"/>

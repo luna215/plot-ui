@@ -20,7 +20,33 @@ export default class PointComponent extends React.Component {
     }
 
     render() {
-        return ([
+        return this.props.selected ? ([
+                <circle
+                    r="10"
+                    key={this.props.id+"circle"}
+                    id={this.props.id}
+                    cx={this.props.x} 
+                    cy={this.props.y} 
+                    onMouseEnter={this.handleHover} 
+                    onMouseLeave={this.handleHoverOff}
+                    onMouseDown={this.props.onMouseDown}
+                    onClick={this.props.onClick}
+                    fill="#8DEEEE"
+                    stroke="black"
+                    strokeWidth="5"
+                />,
+                <PointInfoComponent 
+                    x={this.props.x} 
+                    y={this.props.y}
+                    nX={this.props.nX}
+                    nY={this.props.nY}
+                    key={this.props.id + "pointinfo"}
+                    id={this.props.id}
+                    width={70}
+                    height={60}
+                    show={true}
+                />
+            ]) : ([
                 <circle 
                     r="10"
                     key={this.props.id+"circle"}
