@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default class PointComponent extends React.Component {
     constructor(props) {
@@ -30,7 +30,8 @@ export default class PointComponent extends React.Component {
                     onMouseEnter={this.handleHover} 
                     onMouseLeave={this.handleHoverOff}
                     onMouseDown={this.props.onMouseDown}
-                    fill={this.props.fill}
+                    onClick={this.props.onClick}
+                    fill="black"
                 />, 
                 <PointInfoComponent 
                     x={this.props.x} 

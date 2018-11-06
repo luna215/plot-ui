@@ -4,19 +4,10 @@ import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
 import PointComponent from './PointComponent';
+import InfoComponent from './InfoComponent';
 import './index.css';
 
-class InfoComponent extends React.Component {
-    render() {
-        return (
-            <g>
-                <circle className="infoCircle" r="15" cx="1100" cy="80" fill="white" stroke="black"/>
-                <text className="medium" x="1097" y="90">i</text> 
-                
-            </g>
-        );
-    }
-}
+const appRoot = document.getElementById('root');
 
 class CanvasComponent extends React.Component {
     constructor (props) {
@@ -43,6 +34,7 @@ class CanvasComponent extends React.Component {
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
@@ -50,7 +42,7 @@ class CanvasComponent extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleMouseDown(id) {
+    handleMouseDown(id, event) {
         if(id === 0 || id === this.state.points.length-1){
             return;
         } 
@@ -86,6 +78,8 @@ class CanvasComponent extends React.Component {
         this.setState({
             copyPoint: <PointComponent key="copy" x={updatedCopyPoint.x} y={updatedCopyPoint.y} nX={unNormalizePoint.x} nY={unNormalizePoint.y}/>
         });
+
+        event.preventDefault()
     }
 
     handlePointUpdate(event) {
@@ -103,9 +97,9 @@ class CanvasComponent extends React.Component {
         points.sort((a, b) => a.x - b.x);
         this.setState({
             points: points,
-            selected: undefined,
             copyPoint: undefined,
         });
+        console.log("You've selected: " + this.state.selected);
         event.preventDefault();
     }
 
@@ -127,6 +121,10 @@ class CanvasComponent extends React.Component {
             y: "",
         });
         event.preventDefault();
+    }
+
+    handleClick(i){
+        console.log("You clicked: " + i);
     }
 
     handleDoubleClick(event) {
@@ -195,6 +193,7 @@ class CanvasComponent extends React.Component {
                             nX={this.state.points[i].x}
                             nY={this.state.points[i].y}
                             onMouseDown={() => this.handleMouseDown(i)}
+                            onClick={() => this.handleClick(i)}
                         />);
         }
         return points;
@@ -202,7 +201,6 @@ class CanvasComponent extends React.Component {
 
     render() {
         let points = this.renderPoints();
-        // let lines = this.renderLines();
         let ghostPoint = this.state.copyPoint;
 
         return (
@@ -211,16 +209,15 @@ class CanvasComponent extends React.Component {
                     ref={this.refCallBack} 
                     viewBox="0 0 1200 700" 
                     height={this.props.height} 
-                    width={this.props.width} 
+                    width={this.props.width}
                     onMouseMove={this.handleDrag} 
                     onMouseUp={this.handlePointUpdate}
+                    onClick={this.handleClick}
                     onDoubleClick={this.handleDoubleClick}>  
-
-                    
                     <text x="100" y="90">Control Points</text>
                     <InfoComponent/>
+                    <div id="model-root"></div>
                     
-                    {/* <g transform="translate(0, 700) scale(1, -1)" stroke="black" fill="black"> */}
                     <g stroke="black" fill="black">
                         <Poly 
                             data={this.state.points} 
@@ -291,7 +288,7 @@ class CanvasComponent extends React.Component {
 ReactDOM.render(<CanvasComponent 
                     height="700"
                     width="1200"
-                    padding="200" />, document.getElementById('root'));
+                    padding="200" />, appRoot);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

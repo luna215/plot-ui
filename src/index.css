@@ -54,6 +54,39 @@ form {
   visibility: hidden;
 }
 
+.modal {
+  margin: 0;
+  background-color: rgba(0,0,0,0.5);
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+.inside-modal {
+  background-color: beige;
+  border-radius: 10%;
+  padding: 2em;
+}
+
+.default-button {
+  background-color:#4c66b2;
+  color: white;
+  border-radius: 10%;
+  padding: 1em;
+}
+
+.default-button:hover {
+  background-color: teal;
+  color: white;
+  border-radius: 10%;
+  padding: 1em;
+}
+
 text {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
