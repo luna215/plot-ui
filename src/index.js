@@ -49,7 +49,7 @@ class CanvasComponent extends React.Component {
         let copyPoint = this.normalizePoint({x: this.state.points[id].x, y: this.state.points[id].y});
         this.setState({
             selected: id,
-            copyPoint: <PointComponent key="copy" x={copyPoint.x} y={copyPoint.y} />,
+            copyPoint: "ready",
             updatedX: copyPoint.x,
             updatedY: copyPoint.y,
         });
@@ -97,9 +97,9 @@ class CanvasComponent extends React.Component {
         points.sort((a, b) => a.x - b.x);
         this.setState({
             points: points,
+            selected: undefined,
             copyPoint: undefined,
         });
-        console.log("You've selected: " + this.state.selected);
         event.preventDefault();
     }
 
@@ -126,7 +126,7 @@ class CanvasComponent extends React.Component {
     handleClick(i){
         console.log("You clicked: " + i);
     }
-
+    
     handleDoubleClick(event) {
         let newPoint;
         let x = event.screenX-this.state.startingX;      
@@ -212,7 +212,6 @@ class CanvasComponent extends React.Component {
                     width={this.props.width}
                     onMouseMove={this.handleDrag} 
                     onMouseUp={this.handlePointUpdate}
-                    onClick={this.handleClick}
                     onDoubleClick={this.handleDoubleClick}>  
                     <text x="100" y="90">Control Points</text>
                     <InfoComponent/>
