@@ -38,6 +38,9 @@ form {
   
 }
 
+.small {
+  font-size: 20px;
+}
 .medium {
   font-size: 30px;
 }
@@ -67,6 +70,9 @@ form {
   justify-content: center;
 }
 
+.delete {
+  position: relative;
+}
 .inside-modal {
   background-color: beige;
   border-radius: 10%;
@@ -85,6 +91,20 @@ form {
   color: white;
   border-radius: 10%;
   padding: 1em;
+}
+
+.delete-button {
+  stroke: black;
+  fill: #ED4337
+}
+.delete-button > text {
+  stroke: white;
+  fill: white;
+}
+
+.delete-button:hover {
+  stroke: black;
+  fill: #ff6961;
 }
 
 text {

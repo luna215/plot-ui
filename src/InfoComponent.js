@@ -46,6 +46,10 @@ export default class InfoComponent extends React.Component {
                             <h3>Deleting Point:</h3>
                             <p>Click a point</p>
                         </section>
+                        <section>
+                            <h3>Ordering:</h3>
+                            <p>Points are ordered from least -> greatest based on their x value.</p>
+                        </section>
                         <footer>
                             <button className="default-button" onClick={this.handleHide}>Close</button>
                         </footer>
@@ -60,7 +64,9 @@ export default class InfoComponent extends React.Component {
                     r="15" 
                     cx="1100" 
                     cy="80" 
-                    fill="white"
+                    fill={this.props.fill}
+                    stroke={this.props.fill}
+                    strokeWidth={this.props.strokeWidth}
                     onClick={this.handleShow}
                     />
                 <text onClick={this.handleShow} className="medium" x="1097" y="90">i</text> 

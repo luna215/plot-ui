@@ -38,6 +38,7 @@ class CanvasComponent extends React.Component {
         this.handleClickPoint = this.handleClickPoint.bind(this);
         this.handleClickCanvas = this.handleClickCanvas.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
+        this.deletePoint = this.deletePoint.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
@@ -148,9 +149,10 @@ class CanvasComponent extends React.Component {
                             y={normalizePoint.y}
                             nX={selectedPointX}
                             nY={selectedPointY}
+                            delete={this.deletePoint}
                             selected={true}
-                            onMouseDown={() => this.handleMouseDown(i)}
-                            onClick={() => this.handleClickPoint(i)}
+                            onMouseDown={(evevnt) => this.handleMouseDown(event, i)}
+                            onClick={(event) => this.handleClickPoint(event, i)}
                         />
 
         this.setState({
@@ -187,6 +189,18 @@ class CanvasComponent extends React.Component {
             points: points,
         })
         event.preventDefault();
+    }
+
+    deletePoint(i) {
+        if(i===0 || i===this.state.points.length-1) return;
+        let points = this.state.points.filter((_,j) => j !== i);
+        points.sort((a,b) => {
+            if(a.x === b.x){
+                return a.y - b.y;
+            }
+            return a.x - b.x
+        })
+        this.setState({points: points});
     }
 
     normalizePoint(point) {
@@ -259,7 +273,7 @@ class CanvasComponent extends React.Component {
                     onClick={this.handleClickCanvas}
                     onDoubleClick={this.handleDoubleClick}>  
                     <text x="100" y="90">Control Points</text>
-                    <InfoComponent/>
+                    <InfoComponent fill="white" stroke="black" strokeWidth="5" />
                     <div id="model-root"></div>
                     
                     <g stroke="black" fill="black">
