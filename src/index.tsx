@@ -1,24 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
 import PointComponent from './PointComponent';
 import InfoComponent from './InfoComponent';
+
 import './index.css';
 
 const appRoot = document.getElementById('root');
 
-class CanvasComponent extends React.Component {
-    constructor (props) {
+interface Point {
+    x: number,
+    y: number
+}
+
+class CanvasComponent extends React.Component<any, any> {
+    constructor(props: any) {
         super(props);
-        
+
         this.state = {
-            points: [
+            points:[
                 {x: 0, y: 0},
-                {x: 0.1, y: 0.1},
-                {x: 0.6, y: 0.5},
-                {x: 0.6, y: 0.8},
-                {x: 1, y: 0}
-            ],
+                {x: 0.5, y: 0.5}
+            ] as Point[],
             selectedPoint: undefined,
             x: "",
             y: "",
@@ -29,7 +32,7 @@ class CanvasComponent extends React.Component {
             updatedX: 0,
             updatedY: 0,
             boxBottom: 0,
-        };
+        }
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleDrag = this.handleDrag.bind(this);
@@ -235,8 +238,8 @@ class CanvasComponent extends React.Component {
     }
 
     renderPoints() {
-        let points = [];
-        let point;
+        let points: any[] = [];
+        let point: Point;
         for (let i = 0; i < this.state.points.length; i++){
             point = this.normalizePoint(this.state.points[i]);
             points.push(<PointComponent
@@ -341,20 +344,20 @@ class CanvasComponent extends React.Component {
 }
 
 ReactDOM.render(<CanvasComponent 
-                    height="700"
-                    width="1200"
-                    padding="200" />, appRoot);
+    height="700"
+    width="1200"
+    padding="200" />, appRoot);
 
 function Poly(props) {
 
-    let points = [];
-    let min;
-    let maxX;
-    let maxY;
-    let normalizedX;
-    let normalizedY;
-    let reverseY;
-    let point;
+    let points: Point[] = [];
+    let min:number;
+    let maxX:number;
+    let maxY: number;
+    let normalizedX: number;
+    let normalizedY: number;
+    let reverseY: number;
+    let point: Point;
 
     for(let i = 0; i < props.data.length; i++){
         point = props.data[i];

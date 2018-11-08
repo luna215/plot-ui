@@ -1,27 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
-export default class InfoComponent extends React.Component {
-    constructor(props) {
+export default class InfoComponent extends React.Component<any, any> {
+    constructor(props: any) {
         super(props);
 
         this.state = {showModal: false};
-
-        this.handleShow = this.handleShow.bind(this);
-        this.handleHide = this.handleHide.bind(this);
     }
 
-    handleShow() {
+    handleShow = () => {
         this.setState({showModal: true});
     }
 
     handleHide = () =>  {
         this.setState({showModal: false});
     }
-    
-    render() {
+
+    return() {
         const modal = this.state.showModal ? (
-            <Modal>
+            < Modal>
                 <div className="modal">
                     <div className="inside-modal">
                         <header>
@@ -74,12 +71,16 @@ export default class InfoComponent extends React.Component {
     }
 }
 
-class Modal extends React.Component {
-
-    constructor(props) {
+class Modal extends React.Component<any, any> {
+    el: HTMLDivElement;
+    modalRoot: HTMLElement;
+    constructor(props: any) {
         super(props);
         this.el = document.createElement('div');
-        this.modalRoot = document.getElementById('modal-root');
+
+        const modalRoot = document.getElementById('modal-root');
+        if (modalRoot === null) throw `'modal-root' element missing`
+        this.modalRoot = modalRoot
     }
 
     componentDidMount() {
@@ -90,12 +91,10 @@ class Modal extends React.Component {
         this.modalRoot.removeChild(this.el);
     }
 
-    // React does *not* create a new div. It renders the children into `domNode`.
-    // `domNode` is any valid DOM node, regardless of its location in the DOM.
     render() {
         return ReactDOM.createPortal(
             this.props.children,
-            this.el
-        );
+            this.el,
+        )
     }
 }
