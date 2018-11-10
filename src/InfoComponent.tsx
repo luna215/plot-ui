@@ -1,5 +1,6 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+
+import Modal from './Modal';
 
 export default class InfoComponent extends React.Component<any, any> {
     constructor(props: any) {
@@ -8,15 +9,7 @@ export default class InfoComponent extends React.Component<any, any> {
         this.state = {showModal: false};
     }
 
-    handleShow = () => {
-        this.setState({showModal: true});
-    }
-
-    handleHide = () =>  {
-        this.setState({showModal: false});
-    }
-
-    return() {
+    public render() {
         const modal = this.state.showModal ? (
             < Modal>
                 <div className="modal">
@@ -69,32 +62,12 @@ export default class InfoComponent extends React.Component<any, any> {
             </g>
         );
     }
-}
 
-class Modal extends React.Component<any, any> {
-    el: HTMLDivElement;
-    modalRoot: HTMLElement;
-    constructor(props: any) {
-        super(props);
-        this.el = document.createElement('div');
-
-        const modalRoot = document.getElementById('modal-root');
-        if (modalRoot === null) throw `'modal-root' element missing`
-        this.modalRoot = modalRoot
+    private handleShow = () => {
+        this.setState({showModal: true});
     }
 
-    componentDidMount() {
-        this.modalRoot.appendChild(this.el);
-    }
-
-    componentWillUnmount() {
-        this.modalRoot.removeChild(this.el);
-    }
-
-    render() {
-        return ReactDOM.createPortal(
-            this.props.children,
-            this.el,
-        )
+    private handleHide = () =>  {
+        this.setState({showModal: false});
     }
 }
