@@ -13,10 +13,11 @@ interface Point {
     y: number;
 }
 
-class CanvasComponent extends React.Component<any, any, any> {
+class CanvasComponent extends React.Component<any, any> {
+    private myRef:any;
     constructor(props: any) {
         super(props);
-
+        this.myRef = React.createRef();
         this.state = {
             points:[
                 {x: 0, y: 0},
@@ -39,23 +40,30 @@ class CanvasComponent extends React.Component<any, any, any> {
         this.handleClickCanvas = this.handleClickCanvas.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
+        this.resizingWindow = this.resizingWindow.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.componentWillMount = this.componentWillMount.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
+        this.componentDidUnMount = this.componentDidUnMount.bind(this);
     }
 
     public render() {
         const points = this.renderPoints();
         const ghostPoint = this.state.copyPoint;
         const selectedPoint = this.state.selectedPoint;
-
+        const widthInterval = this.props.width/11;
+        const heightInterval = this.props.height/11; 
+        const height = parseInt(this.props.height, 10) + parseInt(this.props.padding, 10)
+        const width = parseInt(this.props.width, 10) + parseInt(this.props.padding, 10)
         return ([
             <div key="canvas" id="canvas">                
                 <svg 
                     ref={this.refCallBack} 
-                    viewBox="0 0 1200 700" 
-                    height={this.props.height} 
-                    width={this.props.width}
+                    viewBox={`0 0 ${width} ${height}`}
+                    height={height} 
+                    width={width}
                     onMouseMove={this.handleDrag} 
                     onMouseUp={this.handlePointUpdate}
                     onClick={this.handleClickCanvas}
@@ -80,7 +88,7 @@ class CanvasComponent extends React.Component<any, any, any> {
                         <line x1="1100" x2="1100" y1="100" y2="600" stroke="black" strokeWidth="5" strokeLinecap="square"/>
                     </g>
                     <g className="x-labels">
-                        <text x="100" y="630">0</text>
+                        <text x="90" y="630">0</text>
                         <text x="190" y="630">0.1</text>
                         <text x="290" y="630">0.2</text>
                         <text x="390" y="630">0.3</text>
@@ -116,7 +124,7 @@ class CanvasComponent extends React.Component<any, any, any> {
                         </linearGradient>
                     </defs>
  
-                    <rect id="rect1" x="100" y="650" rx="15" ry="15" width="1000" height="30" fill="url(#Gradient)"/>
+                    <rect id="rect1" x={this.props.padding/2} y={(this.props.height+this.props.padding)-(this.props.padding/4)} rx="15" ry="15" width={this.props.width} height="30" fill="url(#Gradient)"/>
                     
                 </svg>
                 <form onSubmit={this.handleSubmit}>
@@ -149,13 +157,14 @@ class CanvasComponent extends React.Component<any, any, any> {
             return
         }
         let updatedCopyPoint;
+        const padding = this.props.padding/2;
         const x = event.screenX-this.state.startingX;      
-        const y = this.props.height - (this.state.boxBottom - event.screenY + 100);
+        const y = (this.props.height+this.props.padding) - (this.state.boxBottom - event.screenY + 130);
 
-        if( x < (this.props.padding/2) || 
-            x > (this.props.width-(this.props.padding/2)) || 
-            y > (this.props.height-(this.props.padding/2)) || 
-            y < (this.props.padding/2)) {
+        if( x < (padding) || 
+            x > (this.props.width+(padding)) || 
+            y > (this.props.height+(padding)) || 
+            y < (padding)) {
             return;
         }
         updatedCopyPoint = {x, y};
@@ -250,12 +259,13 @@ class CanvasComponent extends React.Component<any, any, any> {
     private handleDoubleClick(event) {
         let newPoint;
         const x = event.screenX-this.state.startingX;      
-        const y = this.props.height - (this.state.boxBottom - event.screenY + 100);
+        const y = (this.props.height+this.props.padding) - (this.state.boxBottom - event.screenY + 130);
         const points = this.state.points;
+        const padding = this.props.padding/2; 
 
-        if( x < (this.props.padding/2) || 
-            x > (this.props.width-(this.props.padding/2)) || 
-            y > (this.props.height-(this.props.padding/2)) || 
+        if( x < (padding) || 
+            x > (this.props.width+(padding)) || 
+            y > (this.props.height+(padding)) || 
             y < (this.props.padding/2)) {
             return;
         }
@@ -285,34 +295,46 @@ class CanvasComponent extends React.Component<any, any, any> {
 
     private normalizePoint(point: Point) {
         const min = this.props.padding/2;
-        const maxX = this.props.width-min;
-        const maxY = this.props.height-min; 
+        const maxX = this.props.width+min;
+        const maxY = this.props.height+min; 
         const normalizedX = (point.x*(maxX-min))+min; 
         const normalizedY = (point.y*(maxY-min))+min;
-        const reverseY = this.props.height-normalizedY
+        const reverseY = (this.props.height+this.props.padding)-normalizedY
 
+        
         return {x:normalizedX, y:reverseY};
     }
 
     private unNormalizePoint(point: Point) {
         const min = this.props.padding/2;
-        const maxX = this.props.width-min; 
-        const maxY = this.props.height-min;
+        const maxX = this.props.width+min; 
+        const maxY = this.props.height+min;
         const unNormalizedX = (point.x-min)/(maxX-min);
 
         // we have to take into account that we reversed y when we first normalized it.
-        const unNormalizedY = (this.props.height-point.y-min)/(maxY-min); 
+        const unNormalizedY = ((this.props.height+this.props.padding)-point.y-min)/(maxY-min); 
 
         return {x: unNormalizedX, y: unNormalizedY};
     }
 
     private refCallBack(element) {
         if(element){
+            this.myRef = element;
             this.setState({
-                startingX: element.getBoundingClientRect().x,
-                startingY: element.getBoundingClientRect().y,
-                boxBottom: element.getBoundingClientRect().bottom,
+                startingX: this.myRef.getBoundingClientRect().x,
+                startingY: this.myRef.getBoundingClientRect().y,
+                boxBottom: this.myRef.getBoundingClientRect().bottom,
             });
+        }
+    }
+
+    public resizingWindow() {
+        if(this.myRef) {
+            this.setState({
+                startingX: this.myRef.getBoundingClientRect().x,
+                startingY: this.myRef.getBoundingClientRect().y,
+                boxBottom: this.myRef.getBoundingClientRect().bottom,
+            })
         }
     }
 
@@ -335,12 +357,34 @@ class CanvasComponent extends React.Component<any, any, any> {
         }
         return points;
     }
+
+    public componentWillMount() {
+        ['resize', 'scroll'].forEach(event => {
+            window.addEventListener(event, this.resizingWindow);
+        });
+        // window.addEventListener("resize", this.resizingWindow);
+      }
+    
+    public componentDidMount() {
+        ['resize', 'scroll'].forEach(event => {
+            window.addEventListener(event, this.resizingWindow);
+        });
+        // window.addEventListener("resize", this.resizingWindow);
+      }
+    
+    public componentDidUnMount() {
+        ['resize', 'scroll'].forEach(event => {
+            window.addEventListener(event, this.resizingWindow);
+        });
+        // window.addEventListener("resize", this.resizingWindow);
+    }
+    
 }
 
 ReactDOM.render(<CanvasComponent 
-    height="700"
-    width="1200"
-    padding="200" />, appRoot);
+    height={500}
+    width={1000}
+    padding={200} />, appRoot);
 
 function Poly(props) {
 
@@ -353,12 +397,12 @@ function Poly(props) {
     let reverseY: number;
 
     for(const point of props.data){
-        min = props.padding/2;
-        maxX = props.width-min;
-        maxY = props.height-min; 
+        min = parseInt(props.padding, 10)/2;
+        maxX = parseInt(props.width, 10)+min;
+        maxY = parseInt(props.height, 10)+min; 
         normalizedX = (point.x*(maxX-min))+min; 
         normalizedY = (point.y*(maxY-min))+min;
-        reverseY = props.height-normalizedY;
+        reverseY = (props.height+props.padding)-normalizedY;
         points.push({x: normalizedX, y: reverseY});
         points.sort((a, b) => { 
             if(a.x === b.x){

@@ -12,7 +12,6 @@
       "object-literal-sort-keys": false,
       "member-ordering": [false, {}],
       "interface-over-type-literal": false
-
     }
   }
   
