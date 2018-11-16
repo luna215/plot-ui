@@ -97,7 +97,6 @@ class CanvasComponent extends React.Component<any, any> {
             updatedX: 0,
             updatedY: 0,
             boxBottom: 0,
-            addedPoint: undefined,
         };
         this.height = 400;
         this.width = 800;
