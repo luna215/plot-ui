@@ -535,10 +535,7 @@ class CanvasComponent extends React.Component<any, any> {
     
 }
 
-ReactDOM.render(<CanvasComponent 
-    height={200}
-    width={200}
-    padding={0} />, appRoot);
+ReactDOM.render(<CanvasComponent />, appRoot);
 
 function Poly(props) {
 
