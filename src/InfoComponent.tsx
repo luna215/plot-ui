@@ -49,15 +49,15 @@ export default class InfoComponent extends React.Component<any, any> {
             <g>
                 <circle 
                     className="infoCircle" 
-                    r="15" 
-                    cx="1100" 
-                    cy="80" 
+                    r="20" 
+                    cx={this.props.cx} 
+                    cy={this.props.cy} 
                     fill={this.props.fill}
                     stroke={this.props.fill}
                     strokeWidth={this.props.strokeWidth}
                     onClick={this.handleShow}
                     />
-                <text onClick={this.handleShow} className="medium" x="1097" y="90">i</text> 
+                <text onClick={this.handleShow} className="medium" x={this.props.x} y={this.props.y}>i</text> 
                 {modal}
             </g>
         );
