@@ -92,8 +92,6 @@ class CanvasComponent extends React.Component<any, any> {
             y: "",
             selected: undefined,
             copyPoint: undefined,
-            startingX: 0,
-            startingY: 0,
             updatedX: 0,
             updatedY: 0,
             boxBottom: 0,
@@ -155,11 +153,11 @@ class CanvasComponent extends React.Component<any, any> {
             this.width+this.padding/2,
             this.padding/2
         );
+        
         this.handleDrag = this.handleDrag.bind(this);
         this.handleClickCanvas = this.handleClickCanvas.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
-        this.resizingWindow = this.resizingWindow.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
     }
@@ -473,21 +471,6 @@ class CanvasComponent extends React.Component<any, any> {
     private refCallBack(element) {
         if(element){
             this.myRef = element;
-            this.setState({
-                startingX: this.myRef.getBoundingClientRect().x,
-                startingY: this.myRef.getBoundingClientRect().y,
-                boxBottom: this.myRef.getBoundingClientRect().bottom,
-            });
-        }
-    }
-
-    public resizingWindow() {
-        if(this.myRef) {
-            this.setState({
-                startingX: this.myRef.getBoundingClientRect().x,
-                startingY: this.myRef.getBoundingClientRect().y,
-                boxBottom: this.myRef.getBoundingClientRect().bottom,
-            })
         }
     }
 
