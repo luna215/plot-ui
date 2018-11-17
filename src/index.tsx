@@ -162,10 +162,6 @@ class CanvasComponent extends React.Component<any, any> {
         this.resizingWindow = this.resizingWindow.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
         this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.componentWillMount = this.componentWillMount.bind(this);
-        this.componentDidMount = this.componentDidMount.bind(this);
-        this.componentDidUnMount = this.componentDidUnMount.bind(this);
     }
 
     public render() {
@@ -316,6 +312,12 @@ class CanvasComponent extends React.Component<any, any> {
         points.push(updatedPoint);;
         points.sort((a, b) => { 
             if(a.x === b.x){
+                if(a.x === 0){
+                    return a.y-b.y;
+                }
+                if(a.y === 1){
+                    return b.y-a.y;
+                }
                 return a.y-b.y;
             }
             return a.x - b.x
@@ -332,24 +334,6 @@ class CanvasComponent extends React.Component<any, any> {
         const name = event.target.name;
         const value = event.target.value;
         this.setState({[name]: value});
-        event.preventDefault();
-    }
-
-    private handleSubmit(event) {
-        const newPoint = {x: this.state.x, y: this.state.y};
-        const points = this.state.points.slice();
-        points.push(newPoint);
-        points.sort((a, b) => { 
-            if(a.x === b.x){
-                return a.y-b.y;
-            }
-            return a.x - b.x
-        });
-        this.setState({
-            points,
-            x: "",
-            y: "",
-        });
         event.preventDefault();
     }
 
@@ -397,7 +381,13 @@ class CanvasComponent extends React.Component<any, any> {
         points.push(newPoint);
         points.sort((a, b) => { 
             if(a.x === b.x){
-                return b.y-a.y;
+                if(a.x === 0){
+                    return a.y-b.y;
+                }
+                if(a.y === 1){
+                    return b.y-a.y;
+                }
+                return a.y-b.y;
             }
             return a.x - b.x
         });
@@ -408,12 +398,18 @@ class CanvasComponent extends React.Component<any, any> {
     private deletePoint = (i:number) => {
     if(i===0 || i===this.state.points.length-1){ return};
         const points = this.state.points.filter((_,j) => j !== i);
-        points.sort((a,b) => {
+        points.sort((a, b) => { 
             if(a.x === b.x){
-                return a.y - b.y;
+                if(a.x === 0){
+                    return a.y-b.y;
+                }
+                if(a.y === 1){
+                    return b.y-a.y;
+                }
+                return a.y-b.y;
             }
             return a.x - b.x
-        })
+        });
         this.setState({points});
     }
 
@@ -514,25 +510,6 @@ class CanvasComponent extends React.Component<any, any> {
         }
         return points;
     }
-
-    public componentWillMount() {
-        ['resize', 'scroll'].forEach(event => {
-            window.addEventListener(event, this.resizingWindow);
-        });
-      }
-    
-    public componentDidMount() {
-        ['resize', 'scroll'].forEach(event => {
-            window.addEventListener(event, this.resizingWindow);
-        });
-      }
-    
-    public componentDidUnMount() {
-        ['resize', 'scroll'].forEach(event => {
-            window.addEventListener(event, this.resizingWindow);
-        });
-    }
-    
 }
 
 ReactDOM.render(<CanvasComponent />, appRoot);
@@ -546,7 +523,7 @@ function Poly(props) {
     let normalizedX: number;
     let normalizedY: number;
     let reverseY: number;
-
+    
     for(const point of props.data){
         min = parseInt(props.padding, 10)/2;
         maxX = parseInt(props.width, 10)+min;
@@ -555,12 +532,6 @@ function Poly(props) {
         normalizedY = (point.y*(maxY-min))+min;
         reverseY = (props.height+props.padding)-normalizedY;
         points.push({x: normalizedX, y: reverseY});
-        points.sort((a, b) => { 
-            if(a.x === b.x){
-                return a.y-b.y;
-            }
-            return a.x - b.x
-        });
     }
 
     if (props.k == null) {props.k = 0.5};
