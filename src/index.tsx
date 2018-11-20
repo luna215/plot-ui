@@ -177,7 +177,6 @@ class CanvasComponent extends React.Component<any, CanvasComponentState> {
                     id="svg"
                     ref={this.refCallBack} 
                     viewBox={`0 0 ${this.width+this.padding} ${this.height+this.padding}`}
-                    preserveAspectRatio="xMidYMid contain"
                     onMouseMove={this.handleDrag} 
                     onMouseUp={this.handlePointUpdate}
                     onClick={this.handleClickCanvas}
