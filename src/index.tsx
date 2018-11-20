@@ -30,7 +30,16 @@ interface TextLabel {
     y: number;
 }
 
-class CanvasComponent extends React.Component<any, any> {
+interface CanvasComponentState {
+    points: Point[],
+    selectedPoint: any,
+    selected: number | undefined,
+    copyPoint: any,
+    updatedX: number, 
+    updatedY: number,
+}
+
+class CanvasComponent extends React.Component<any, CanvasComponentState> {
     private myRef:any;
     private height: number;
     private width: number;
@@ -86,15 +95,12 @@ class CanvasComponent extends React.Component<any, any> {
                 {x: 0, y: 0},
                 {x: 0.5, y: 0.5},
                 {x: 1, y: 0}
-            ] as Point[],
+            ],
             selectedPoint: undefined,
-            x: "",
-            y: "",
             selected: undefined,
             copyPoint: undefined,
             updatedX: 0,
             updatedY: 0,
-            boxBottom: 0,
         };
         this.height = 400;
         this.width = 800;
@@ -159,14 +165,12 @@ class CanvasComponent extends React.Component<any, any> {
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.refCallBack = this.refCallBack.bind(this);
         this.handlePointUpdate = this.handlePointUpdate.bind(this);
-        this.handlePointsUpdate = this.handlePointsUpdate.bind(this);
     }
 
     public render() {
         const points = this.renderPoints();
         const ghostPoint = this.state.copyPoint;
         const selectedPoint = this.state.selectedPoint;
-        const addedPoint = this.state.addedPoint
         return ([
             <div key="canvas" id="canvas">                
                 <svg 
@@ -199,7 +203,6 @@ class CanvasComponent extends React.Component<any, any> {
                         {points}
                         {ghostPoint}
                         {selectedPoint}
-                        {addedPoint}
 
                         <line x1={this.topLine.x1} x2={this.topLine.x2} y1={this.topLine.y1} y2={this.topLine.y2} stroke="black" strokeWidth="5" strokeLinecap="square"/>
                         <line x1={this.bottomLine.x1} x2={this.bottomLine.x2} y1={this.bottomLine.y1} y2={this.bottomLine.y2} stroke="black" strokeWidth="5" strokeLinecap="square"/>
@@ -325,13 +328,6 @@ class CanvasComponent extends React.Component<any, any> {
             selected: undefined,
             copyPoint: undefined,
         });
-        event.preventDefault();
-    }
-
-    private handlePointsUpdate(event) {
-        const name = event.target.name;
-        const value = event.target.value;
-        this.setState({[name]: value});
         event.preventDefault();
     }
 
