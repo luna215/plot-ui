@@ -1,7 +1,8 @@
-This project was made to use in RCSB's molstar-proto(https://github.com/molstar/molstar-proto) project
+This project was made to use in RCSB's molstar-proto project(https://github.com/molstar/molstar-proto)
 
-## How to Use 
+You can also custmozie the canvas to fit you needs.
 
+### How to Use
 
 ## Available Scripts
 
